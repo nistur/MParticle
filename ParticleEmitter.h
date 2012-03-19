@@ -4,6 +4,8 @@
 #include <MEngine.h>
 #include <MBehavior.h>
 
+#include "ParticleLib/pAPI.h"
+
 class ParticleEmitter : public MBehavior
 {
 public:
@@ -23,7 +25,14 @@ public:
 	MVariable getVariable(unsigned int id);
 
 	void update(void);
+	void draw();
 	void runEvent(int param){}
+
+private:
+	void Init();
+
+
+	PAPI::ParticleContext_t m_Context;
 };
 
 #endif /* __PARTICLE_EMITTER_H__*/
