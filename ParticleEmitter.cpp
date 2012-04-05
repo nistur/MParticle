@@ -1,21 +1,42 @@
 #include "ParticleEmitter.h"
 
-using namespace PAPI;
+#include "Particle.h"
+#include "ParticleSystem.h"
 
-ParticleEmitter::ParticleEmitter(MObject3d * parentObject):
-MBehavior(parentObject)
+#include <algorithm>
+
+ParticleEmitter::ParticleEmitter(MObject3d * parentObject)
+: MBehavior(parentObject)
+, m_Count(1000)
+, m_EmitPeriod(50)
+, m_Positions(0)
+, m_PrevEmitTime(0)
+, m_Age(0)
+, m_PrevTickTime(0)
+, m_MinLife(0)
+, m_MaxLife(100)
 {
 	Init();
 }
 
-ParticleEmitter::ParticleEmitter(ParticleEmitter & behavior, MObject3d * parentObject):
-MBehavior(parentObject)
+ParticleEmitter::ParticleEmitter(ParticleEmitter & behavior, MObject3d * parentObject)
+: MBehavior(parentObject)
+, m_Count(1000)
+, m_EmitPeriod(50)
+, m_Positions(0)
+, m_PrevEmitTime(0)
+, m_Age(0)
+, m_PrevTickTime(0)
+, m_MinLife(0)
+, m_MaxLife(100)
 {
 	Init();
 }
 
 ParticleEmitter::~ParticleEmitter(void)
-{}
+{
+	Cleanup();
+}
 
 void ParticleEmitter::destroy(void) { delete this; }
 
@@ -30,13 +51,25 @@ MBehavior * ParticleEmitter::getCopy(MObject3d * parentObject)
 }
 
 unsigned int ParticleEmitter::getVariablesNumber(void){
-	return 0;
+	return 4;
 }
 
 MVariable ParticleEmitter::getVariable(unsigned int id)
 {
 	switch(id)
 	{
+	case 0:
+		return MVariable("MaxCount", &m_Count, M_VARIABLE_INT);
+		break;
+	case 1:
+		return MVariable("EmitPeriod", &m_EmitPeriod, M_VARIABLE_INT);
+		break;
+	case 2:
+		return MVariable("MinLife", &m_MinLife, M_VARIABLE_INT);
+		break;
+	case 3:
+		return MVariable("MaxLife", &m_MaxLife, M_VARIABLE_INT);
+		break;
 	default:
 		return MVariable("NULL", NULL, M_VARIABLE_NULL);
 		break;
@@ -49,64 +82,125 @@ void ParticleEmitter::update(void)
 
 	MGame* game = engine->getGame();
 
+	GetParticleSystem()->Update();
+
 	if(game->isRunning())
 	{
-		// Set up the state.
-		m_Context.Velocity(PDCylinder(pVec(0.0f, -0.01f, 0.25f), pVec(0.0f, -0.01f, 0.27f), 0.021f, 0.019f));
-		m_Context.Color(PDLine(pVec(0.8f, 0.9f, 1.0f), pVec(1.0f, 1.0f, 1.0f)));
-
-		// Generate particles along a very small line in the nozzle.
-		m_Context.Source(100, PDLine(pVec(0, 0, 0), pVec(0, 0, 0.4f)));
-
-		// Gravity.
-		m_Context.Gravity(pVec(0, 0, -0.01f));
-
-		// Bounce particles off a disc of radius 5.
-		m_Context.Bounce(-0.05f, 0.35f, 0, PDDisc(pVec(0, 0, 0), pVec(0, 0, 1), 5));
-
-		// Kill particles below Z=-3.
-		m_Context.Sink(false, PDPlane(pVec(0,0,-3), pVec(0,0,1)));
-
-		// Move particles to their new positions.
-		m_Context.Move(true, false);
+		CheckToSpawnParticles();
 	}
 }
 
 void ParticleEmitter::draw()
 {
 	MEngine* engine = MEngine::getInstance();
-	MGame* game = engine->getGame();
 	MRenderingContext* render = engine->getRenderingContext();
 
-	if(game->isRunning())
+	render->enableVertexArray();
+	render->setVertexPointer(M_FLOAT, 3, m_Positions);
+
+	render->enableColorArray();
+	render->setColorPointer(M_BYTE, 4, m_Colours);
+
+	render->drawArray(M_PRIMITIVE_POINTS, 0, m_Count);
+
+}
+
+void ParticleEmitter::NotifyParticleDeath(int id)
+{
+	m_FreeParticles.push_back(id);
+	m_Positions[id] = Vec3(0,0,0);
+	m_Colours[id].a = 0;
+}
+
+void ParticleEmitter::RemoveRef(EmitterRef* ref)
+{
+	vector<EmitterRef*>::iterator it = std::find(m_Refs.begin(), m_Refs.end(), ref);
+
+	if(it != m_Refs.end())
 	{
-		size_t cnt = m_Context.GetGroupCount();
-		if(cnt < 1) return;
-
-		float *ptr;
-		size_t flstride, pos3Ofs, posB3Ofs, size3Ofs, vel3Ofs, velB3Ofs, color3Ofs, alpha1Ofs, age1Ofs, up3Ofs, rvel3Ofs, upB3Ofs, mass1Ofs, data1Ofs;
-
-		cnt = m_Context.GetParticlePointer(ptr, flstride, pos3Ofs, posB3Ofs,
-			size3Ofs, vel3Ofs, velB3Ofs, color3Ofs, alpha1Ofs, age1Ofs,
-			up3Ofs, rvel3Ofs, upB3Ofs, mass1Ofs, data1Ofs);
-		if(cnt < 1) return;
-		
-		render->enableColorArray();
-		render->setColorPointer(M_FLOAT, int(flstride) * sizeof(float), ptr + color3Ofs);
-		
-		render->enableVertexArray();
-		render->setVertexPointer(M_FLOAT, int(flstride) * sizeof(float), ptr + pos3Ofs);
-		
-		render->drawArray(M_PRIMITIVE_POINTS, 0, cnt);
-		render->disableVertexArray();
-		render->disableColorArray();
+		m_Refs.erase(it);
 	}
 }
 
 void ParticleEmitter::Init()
 {
-	int handle = m_Context.GenParticleGroups(1, 10000);
+	// this is currently only called when the editor
+	// creates the object, which means you can't
+	// edit and then run the game to check it.
+	// you have to run the game twice for the changes to
+	// take effect. Meh.
+	if(m_Positions == 0)
+	{
+		m_Positions = new Vec3[m_Count];
+		m_Colours = new MColor[m_Count];
 
-	m_Context.CurrentGroup(handle);
+		// push the IDs in backwards
+		for(int i = 0; i < m_Count; ++i)
+		{
+			m_FreeParticles.push_back(m_Count - i - 1);
+			m_Colours[i].set(128, 128, 128, 0);
+		}
+	}
+
 }
 
+void ParticleEmitter::Cleanup()
+{
+	if(m_Positions != 0)
+	{
+		delete [] m_Positions;
+		m_Positions = 0;
+	}
+
+	if(m_Colours != 0)
+	{
+		delete [] m_Colours;
+		m_Colours = 0;
+	}
+		
+	m_FreeParticles.clear();
+
+	for(unsigned int i = 0; i < m_Refs.size(); ++i)
+		m_Refs[i]->Clear();
+	m_Refs.clear();
+}
+
+void ParticleEmitter::CheckToSpawnParticles()
+{
+	MEngine* engine = MEngine::getInstance();
+	MSystemContext* system = engine->getSystemContext();
+
+	int tick = system->getSystemTick();
+
+	if(m_PrevEmitTime == 0)
+	{
+		m_PrevEmitTime = tick;
+		m_PrevTickTime = tick;
+	}
+
+	m_Age += tick - m_PrevTickTime;
+
+	while((m_PrevEmitTime + m_EmitPeriod < tick) &&
+		(m_FreeParticles.size() > 0))
+	{
+		m_PrevEmitTime += m_EmitPeriod;
+		EmitParticle();
+	}
+
+}
+
+void ParticleEmitter::EmitParticle()
+{
+	ParticleSystem* world = GetParticleSystem();
+
+	if(Particle* newParticle = world->GetNewParticle())
+	{
+		int ID = m_FreeParticles.back();
+		m_Colours[ID].a = 128;
+		newParticle->SetPosition(&m_Positions[ID]);
+		newParticle->SetEmitter(this);
+		newParticle->SetLife(m_MinLife + (rand() % (m_MaxLife - m_MinLife)));
+		newParticle->SetVelocity(Vec3(0, 0, 1.0f));
+		m_FreeParticles.pop_back();
+	}
+}

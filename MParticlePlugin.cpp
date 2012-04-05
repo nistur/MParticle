@@ -1,5 +1,6 @@
 #include "MParticlePlugin.h"
 
+#include "ParticleSystem.h"
 #include "ParticleEmitter.h"
 
 #include <MEngine.h>
@@ -13,6 +14,8 @@ void StartPlugin()
 	// add behaviors
 	MBehaviorManager * behaviorManager = engine->getBehaviorManager();
 	behaviorManager->addBehavior(ParticleEmitter::getStaticName(), M_OBJECT3D, ParticleEmitter::getNew);
+
+	GetParticleSystem()->Init();
 }
 
 void EndPlugin()
