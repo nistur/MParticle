@@ -25,6 +25,7 @@ solution "MParticle"
 		files {
 			"**.cpp",
 			"**.h",
+			"**.md",
 			os.getenv("MSDKDIR") .. "SDK/**.h"
 		}
 
@@ -33,7 +34,8 @@ solution "MParticle"
 			["MCore/*"] = os.getenv("MSDKDIR") .. "SDK/MCore/Includes/**.h",
 			["MEngine/*"] = os.getenv("MSDKDIR") .. "SDK/MEngine/Includes/**.h",
 			["MGui/*"] = os.getenv("MSDKDIR") .. "SDK/MGui/Includes/**.h",
-			["Game/*"] = { "**.h", "**.cpp" }
+			["Game/*"] = { "**.h", "**.cpp" },
+			["Doc/*"] = { "**.md" }
 		}
 
 		-- link to Maratis

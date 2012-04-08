@@ -3,6 +3,8 @@
 #include "Particle.h"
 #include "ParticleSystem.h"
 
+#include <MMaths.h>
+
 #include <algorithm>
 
 ParticleEmitter::ParticleEmitter(MObject3d * parentObject)
@@ -13,8 +15,13 @@ ParticleEmitter::ParticleEmitter(MObject3d * parentObject)
 , m_PrevEmitTime(0)
 , m_Age(0)
 , m_PrevTickTime(0)
-, m_MinLife(0)
-, m_MaxLife(100)
+, m_MinLife(1000)
+, m_MaxLife(5000)
+, m_EmitDir(0.0f, 0.0f, 1.0f)
+, m_Acceleration(0.0f, 0.0f, 0.0f)
+, m_HasGravity(false)
+, m_Angle(0.0f)
+, m_Force(1.0f)
 {
 	Init();
 }
@@ -29,6 +36,11 @@ ParticleEmitter::ParticleEmitter(ParticleEmitter & behavior, MObject3d * parentO
 , m_PrevTickTime(0)
 , m_MinLife(0)
 , m_MaxLife(100)
+, m_EmitDir(0.0f, 0.0f, 1.0f)
+, m_Acceleration(0.0f, 0.0f, 0.0f)
+, m_HasGravity(false)
+, m_Angle(0.0f)
+, m_Force(1.0f)
 {
 	Init();
 }
@@ -51,7 +63,7 @@ MBehavior * ParticleEmitter::getCopy(MObject3d * parentObject)
 }
 
 unsigned int ParticleEmitter::getVariablesNumber(void){
-	return 4;
+	return 9;
 }
 
 MVariable ParticleEmitter::getVariable(unsigned int id)
@@ -69,6 +81,21 @@ MVariable ParticleEmitter::getVariable(unsigned int id)
 		break;
 	case 3:
 		return MVariable("MaxLife", &m_MaxLife, M_VARIABLE_INT);
+		break;
+	case 4:
+		return MVariable("Direction", &m_EmitDir, M_VARIABLE_VEC3);
+		break;
+	case 5:
+		return MVariable("Gravity", &m_HasGravity, M_VARIABLE_BOOL);
+		break;
+	case 6:
+		return MVariable("Acceleration", &m_Acceleration, M_VARIABLE_VEC3);
+		break;
+	case 7:
+		return MVariable("Spread", &m_Angle, M_VARIABLE_FLOAT);
+		break;
+	case 8:
+		return MVariable("Force", &m_Force, M_VARIABLE_FLOAT);
 		break;
 	default:
 		return MVariable("NULL", NULL, M_VARIABLE_NULL);
@@ -95,6 +122,8 @@ void ParticleEmitter::draw()
 	MEngine* engine = MEngine::getInstance();
 	MRenderingContext* render = engine->getRenderingContext();
 
+	//render->enableBlending();
+	//render->setBlendingMode(M_BLENDING_ALPHA);
 	render->enableVertexArray();
 	render->setVertexPointer(M_FLOAT, 3, m_Positions);
 
@@ -108,7 +137,7 @@ void ParticleEmitter::draw()
 void ParticleEmitter::NotifyParticleDeath(int id)
 {
 	m_FreeParticles.push_back(id);
-	m_Positions[id] = Vec3(0,0,0);
+	m_Positions[id] = MVector3(0,0,0);
 	m_Colours[id].a = 0;
 }
 
@@ -131,14 +160,14 @@ void ParticleEmitter::Init()
 	// take effect. Meh.
 	if(m_Positions == 0)
 	{
-		m_Positions = new Vec3[m_Count];
+		m_Positions = new MVector3[m_Count];
 		m_Colours = new MColor[m_Count];
 
 		// push the IDs in backwards
 		for(int i = 0; i < m_Count; ++i)
 		{
 			m_FreeParticles.push_back(m_Count - i - 1);
-			m_Colours[i].set(128, 128, 128, 0);
+			m_Colours[i].set(255, 255, 255, 0);
 		}
 	}
 
@@ -196,11 +225,29 @@ void ParticleEmitter::EmitParticle()
 	if(Particle* newParticle = world->GetNewParticle())
 	{
 		int ID = m_FreeParticles.back();
-		m_Colours[ID].a = 128;
+		m_Colours[ID].a = 255;
+		newParticle->SetID(ID);
 		newParticle->SetPosition(&m_Positions[ID]);
 		newParticle->SetEmitter(this);
 		newParticle->SetLife(m_MinLife + (rand() % (m_MaxLife - m_MinLife)));
-		newParticle->SetVelocity(Vec3(0, 0, 1.0f));
+
+		// pick a random axis, let's say X
+		MVector3 axis(1.0f, 0.0f, 0.0f);
+		// just check we're not going to use X itself
+		if(m_EmitDir.x != 0 && m_EmitDir.y == 0 && m_EmitDir.z == 0)
+			axis = MVector3(0.0f, 1.0f, 0.0f);
+
+		float angle = m_Angle * (float)rand() / (float)RAND_MAX;
+		float spread = 360.0f * (float)rand() / (float)RAND_MAX;
+
+		MMatrix4x4 mat;
+		mat.setRotationAxis(spread, m_EmitDir);
+		mat.rotate(axis, angle);
+
+		MVector3 dir = mat.getRotatedVector3(m_EmitDir).getNormalized();
+		newParticle->SetVelocity(dir * m_Force);
+		newParticle->SetAcceleration(m_Acceleration);
+		newParticle->SetHasGravity(m_HasGravity);
 		m_FreeParticles.pop_back();
 	}
 }

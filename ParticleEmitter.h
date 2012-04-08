@@ -4,11 +4,8 @@
 #include <MEngine.h>
 #include <MBehavior.h>
 
-#include "Util/Vector.h"
-
 #include <vector>
 
-using Util::Vec3;
 using std::vector;
 
 class EmitterRef;
@@ -51,15 +48,20 @@ private:
 	//----------------------------------------
 	// Exposed values
 	//----------------------------------------
-	int		m_Count;
-	int		m_EmitPeriod;
-	int		m_MinLife;
-	int		m_MaxLife;
+	int			m_Count;
+	int			m_EmitPeriod;
+	int			m_MinLife;
+	int			m_MaxLife;
+	MVector3	m_EmitDir;
+	MVector3	m_Acceleration;
+	bool		m_HasGravity;
+	float		m_Angle;
+	float		m_Force;
 	
 	//----------------------------------------
 	// Runtime members
 	//----------------------------------------
-	Vec3*		m_Positions;
+	MVector3*	m_Positions;
 	MColor*		m_Colours;
 	vector<int>	m_FreeParticles;
 
@@ -70,6 +72,7 @@ private:
 	vector<EmitterRef*> m_Refs;
 };
 
+// make a semi-smart reference count thingy
 class EmitterRef
 {
 public:

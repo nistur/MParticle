@@ -10,7 +10,7 @@ class ParticleSystem
 public:
 	static ParticleSystem* GetInstance();
 
-	void Init(int maxParticles = 1000);
+	void Init(int maxParticles = 10000);
 	void Update();
 
 	Particle* GetNewParticle();
@@ -22,6 +22,7 @@ private:
 	
 	void MoveParticle(Particle* particle, int dt);
 	void UpdateLife(Particle* particle, int dt);
+	void UpdateVelocity(Particle* particle, int dt);
 
 	typedef std::vector<Particle*> particleVec;
 

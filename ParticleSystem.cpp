@@ -44,6 +44,7 @@ void ParticleSystem::Update()
 	{
 		MoveParticle(&m_Pool[i], dt);
 		UpdateLife(&m_Pool[i], dt);
+		UpdateVelocity(&m_Pool[i], dt);
 	}
 }
 
@@ -52,7 +53,7 @@ void ParticleSystem::MoveParticle(Particle* particle, int dt)
 	if(particle && particle->IsAlive())
 	{
 		float dtS = (float)dt / 1000.0f;
-		*particle->m_Pos = *particle->m_Pos + (particle->m_Velocity * dtS);
+		*particle->m_Pos += (particle->m_Velocity * dtS);
 	}
 }
 
@@ -66,6 +67,21 @@ void ParticleSystem::UpdateLife(Particle* particle, int dt)
 			particle->Die();
 			m_FreeParticles.push_back(particle);
 		}
+	}
+}
+
+void ParticleSystem::UpdateVelocity(Particle* particle, int dt)
+{
+	if(particle && particle->IsAlive())
+	{
+		float dtS = (float)dt / 1000.0f;
+		static MVector3 gravity(0.0f, 0.0f, -0.98f);
+		if(particle->m_Gravity)
+		{
+			particle->m_Velocity += (gravity * dtS);
+		}
+
+		particle->m_Velocity += (particle->m_Acceleration * dtS);
 	}
 }
 
