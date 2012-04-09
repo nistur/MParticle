@@ -22,6 +22,7 @@ ParticleEmitter::ParticleEmitter(MObject3d * parentObject)
 , m_HasGravity(false)
 , m_Angle(0.0f)
 , m_Force(1.0f)
+, m_TexName("")
 {
 	Init();
 }
@@ -41,6 +42,7 @@ ParticleEmitter::ParticleEmitter(ParticleEmitter & behavior, MObject3d * parentO
 , m_HasGravity(false)
 , m_Angle(0.0f)
 , m_Force(1.0f)
+, m_TexName("")
 {
 	Init();
 }
@@ -63,7 +65,7 @@ MBehavior * ParticleEmitter::getCopy(MObject3d * parentObject)
 }
 
 unsigned int ParticleEmitter::getVariablesNumber(void){
-	return 9;
+	return 10;
 }
 
 MVariable ParticleEmitter::getVariable(unsigned int id)
@@ -97,6 +99,9 @@ MVariable ParticleEmitter::getVariable(unsigned int id)
 	case 8:
 		return MVariable("Force", &m_Force, M_VARIABLE_FLOAT);
 		break;
+	case 9:
+	    return MVariable("Texture", &m_TexName, M_VARIABLE_STRING);
+	    break;
 	default:
 		return MVariable("NULL", NULL, M_VARIABLE_NULL);
 		break;
@@ -159,16 +164,16 @@ void ParticleEmitter::Init()
 	// you have to run the game twice for the changes to
 	// take effect. Meh.
 	if(m_Positions == 0)
-	{
-		m_Positions = new MVector3[m_Count];
-		m_Colours = new MColor[m_Count];
+	    m_Positions = new MVector3[m_Count];
+	if(m_Colours == 0)
+	    m_Colours = new MColor[m_Count];
 
-		// push the IDs in backwards
-		for(int i = 0; i < m_Count; ++i)
-		{
-			m_FreeParticles.push_back(m_Count - i - 1);
-			m_Colours[i].set(255, 255, 255, 0);
-		}
+	m_FreeParticles.clear();
+	// push the IDs in backwards
+	for(int i = 0; i < m_Count; ++i)
+	{
+	    m_FreeParticles.push_back(m_Count - i - 1);
+	    m_Colours[i].set(255, 255, 255, 0);
 	}
 
 }
@@ -227,6 +232,8 @@ void ParticleEmitter::EmitParticle()
 		int ID = m_FreeParticles.back();
 		m_Colours[ID].a = 255;
 		newParticle->SetID(ID);
+		if(MObject3d* obj = getParentObject())
+		    m_Positions[ID] = obj->getPosition();
 		newParticle->SetPosition(&m_Positions[ID]);
 		newParticle->SetEmitter(this);
 		newParticle->SetLife(m_MinLife + (rand() % (m_MaxLife - m_MinLife)));

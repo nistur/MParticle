@@ -3,6 +3,7 @@
 
 #include <MEngine.h>
 #include <MBehavior.h>
+#include <MTextureRef.h>
 
 #include <vector>
 
@@ -57,6 +58,7 @@ private:
 	bool		m_HasGravity;
 	float		m_Angle;
 	float		m_Force;
+	MString         m_TexName;
 	
 	//----------------------------------------
 	// Runtime members
