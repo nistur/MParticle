@@ -2,7 +2,8 @@
 solution "MParticle"
 	configurations { "Debug", "Release" }
 	language "C++"
-		
+
+	print(os.getenv("MSDKDIR"))		
 	-- make sure we can search and link properly
 	libdirs { os.getenv("MSDKDIR") .. "SDK/MCore/Libs",
 				os.getenv("MSDKDIR") .. "SDK/MGui/Libs",

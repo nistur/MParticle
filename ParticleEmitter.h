@@ -45,7 +45,7 @@ private:
 	void CheckToSpawnParticles();
 
 	void EmitParticle();
-	
+
 	//----------------------------------------
 	// Exposed values
 	//----------------------------------------
@@ -58,8 +58,9 @@ private:
 	bool		m_HasGravity;
 	float		m_Angle;
 	float		m_Force;
-	MString         m_TexName;
-	
+	MTextureRef*    m_Texture;
+	bool            m_PointSprite;
+
 	//----------------------------------------
 	// Runtime members
 	//----------------------------------------

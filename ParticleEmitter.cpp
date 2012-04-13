@@ -12,6 +12,7 @@ ParticleEmitter::ParticleEmitter(MObject3d * parentObject)
 , m_Count(1000)
 , m_EmitPeriod(50)
 , m_Positions(0)
+, m_Colours(0)
 , m_PrevEmitTime(0)
 , m_Age(0)
 , m_PrevTickTime(0)
@@ -22,7 +23,8 @@ ParticleEmitter::ParticleEmitter(MObject3d * parentObject)
 , m_HasGravity(false)
 , m_Angle(0.0f)
 , m_Force(1.0f)
-, m_TexName("")
+, m_Texture(0)
+, m_PointSprite(false)
 {
 	Init();
 }
@@ -32,6 +34,7 @@ ParticleEmitter::ParticleEmitter(ParticleEmitter & behavior, MObject3d * parentO
 , m_Count(1000)
 , m_EmitPeriod(50)
 , m_Positions(0)
+, m_Colours(0)
 , m_PrevEmitTime(0)
 , m_Age(0)
 , m_PrevTickTime(0)
@@ -42,7 +45,8 @@ ParticleEmitter::ParticleEmitter(ParticleEmitter & behavior, MObject3d * parentO
 , m_HasGravity(false)
 , m_Angle(0.0f)
 , m_Force(1.0f)
-, m_TexName("")
+, m_Texture(0)
+, m_PointSprite(false)
 {
 	Init();
 }
@@ -65,7 +69,7 @@ MBehavior * ParticleEmitter::getCopy(MObject3d * parentObject)
 }
 
 unsigned int ParticleEmitter::getVariablesNumber(void){
-	return 10;
+	return 11;
 }
 
 MVariable ParticleEmitter::getVariable(unsigned int id)
@@ -100,7 +104,10 @@ MVariable ParticleEmitter::getVariable(unsigned int id)
 		return MVariable("Force", &m_Force, M_VARIABLE_FLOAT);
 		break;
 	case 9:
-	    return MVariable("Texture", &m_TexName, M_VARIABLE_STRING);
+	    return MVariable("Texture", &m_Texture, M_VARIABLE_TEXTURE_REF);
+	    break;
+	case 10:
+	    return MVariable("PointSprite", &m_PointSprite, M_VARIABLE_BOOL);
 	    break;
 	default:
 		return MVariable("NULL", NULL, M_VARIABLE_NULL);
@@ -127,6 +134,11 @@ void ParticleEmitter::draw()
 	MEngine* engine = MEngine::getInstance();
 	MRenderingContext* render = engine->getRenderingContext();
 
+	if(m_Texture && m_Texture->getTextureId() > 0)
+	{
+	    //m_Texture->update();
+	    //render->enableTexture();
+	}
 	//render->enableBlending();
 	//render->setBlendingMode(M_BLENDING_ALPHA);
 	render->enableVertexArray();
