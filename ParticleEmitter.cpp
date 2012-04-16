@@ -134,20 +134,24 @@ void ParticleEmitter::draw()
 	MEngine* engine = MEngine::getInstance();
 	MRenderingContext* render = engine->getRenderingContext();
 
+	render->setDepthMask(false);
 	if(m_Texture && m_Texture->getTextureId() > 0)
 	{
-	    //m_Texture->update();
-	    //render->enableTexture();
+	    render->enableTexture();
+		render->setBlendingMode(M_BLENDING_ADD);
+		render->enableBlending();
+
+	    m_Texture->update();
 	}
-	//render->enableBlending();
-	//render->setBlendingMode(M_BLENDING_ALPHA);
+
 	render->enableVertexArray();
 	render->setVertexPointer(M_FLOAT, 3, m_Positions);
 
-	render->enableColorArray();
-	render->setColorPointer(M_BYTE, 4, m_Colours);
+	//render->enableColorArray();
+	//render->setColorPointer(M_BYTE, 4, m_Colours);
 
 	render->drawArray(M_PRIMITIVE_POINTS, 0, m_Count);
+	render->setDepthMask(true);
 
 }
 
