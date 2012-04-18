@@ -60,6 +60,7 @@ private:
 	float		m_Force;
 	MTextureRef*    m_Texture;
 	bool            m_PointSprite;
+	float			m_EmmitSize;
 
 	//----------------------------------------
 	// Runtime members

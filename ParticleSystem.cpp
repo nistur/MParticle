@@ -30,6 +30,8 @@ void ParticleSystem::Update()
 	MEngine* engine = MEngine::getInstance();
 	MSystemContext* system = engine->getSystemContext();
 	int tick = system->getSystemTick();
+	if(MPhysicsContext* physics = engine->getPhysicsContext())
+		m_Gravity = physics->getWorldGravity();
 
 	if((m_PrevTick == 0) || (m_PrevTick == tick))
 	{
@@ -75,10 +77,9 @@ void ParticleSystem::UpdateVelocity(Particle* particle, int dt)
 	if(particle && particle->IsAlive())
 	{
 		float dtS = (float)dt / 1000.0f;
-		static MVector3 gravity(0.0f, 0.0f, -0.98f);
 		if(particle->m_Gravity)
 		{
-			particle->m_Velocity += (gravity * dtS);
+			particle->m_Velocity += (m_Gravity * dtS);
 		}
 
 		particle->m_Velocity += (particle->m_Acceleration * dtS);

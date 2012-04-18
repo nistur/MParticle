@@ -25,6 +25,7 @@ ParticleEmitter::ParticleEmitter(MObject3d * parentObject)
 , m_Force(1.0f)
 , m_Texture(0)
 , m_PointSprite(false)
+, m_EmmitSize(50.0f)
 {
 	Init();
 }
@@ -47,6 +48,7 @@ ParticleEmitter::ParticleEmitter(ParticleEmitter & behavior, MObject3d * parentO
 , m_Force(1.0f)
 , m_Texture(0)
 , m_PointSprite(false)
+, m_EmmitSize(50.0f)
 {
 	Init();
 }
@@ -69,7 +71,7 @@ MBehavior * ParticleEmitter::getCopy(MObject3d * parentObject)
 }
 
 unsigned int ParticleEmitter::getVariablesNumber(void){
-	return 11;
+	return 12;
 }
 
 MVariable ParticleEmitter::getVariable(unsigned int id)
@@ -109,6 +111,9 @@ MVariable ParticleEmitter::getVariable(unsigned int id)
 	case 10:
 	    return MVariable("PointSprite", &m_PointSprite, M_VARIABLE_BOOL);
 	    break;
+	case 11:
+	    return MVariable("EmitSize", &m_EmmitSize, M_VARIABLE_FLOAT);
+	    break;
 	default:
 		return MVariable("NULL", NULL, M_VARIABLE_NULL);
 		break;
@@ -143,6 +148,8 @@ void ParticleEmitter::draw()
 
 	    m_Texture->update();
 	}
+
+	render->setPointSize(5.0f, m_EmmitSize, 60.0f);
 
 	render->enableVertexArray();
 	render->setVertexPointer(M_FLOAT, 3, m_Positions);

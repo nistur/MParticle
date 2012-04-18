@@ -2,6 +2,7 @@
 #define __PARTICLE_SYSTEM_H__
 
 #include <vector>
+#include <MCore.h>
 
 class Particle;
 
@@ -31,6 +32,8 @@ private:
 	particleVec	m_FreeParticles;
 
 	int			m_PrevTick;
+
+	MVector3	m_Gravity;
 };
 
 inline ParticleSystem* GetParticleSystem() { return ParticleSystem::GetInstance(); }
