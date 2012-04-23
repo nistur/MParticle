@@ -61,6 +61,11 @@ private:
 	MTextureRef*    m_Texture;
 	bool            m_PointSprite;
 	float			m_EmmitSize;
+	float			m_Influence;
+	float			m_Mass;
+	int				m_PhysDisableTime;
+	bool			m_PointEmitter;
+	MVector3		m_EmitterSize;
 
 	//----------------------------------------
 	// Runtime members

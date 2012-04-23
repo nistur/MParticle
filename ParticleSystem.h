@@ -24,6 +24,9 @@ private:
 	void MoveParticle(Particle* particle, int dt);
 	void UpdateLife(Particle* particle, int dt);
 	void UpdateVelocity(Particle* particle, int dt);
+	void UpdateParticleCollision(Particle* particle, int dt);
+
+	void CollideParticles(Particle* particle1, Particle* particle2, int dt);
 
 	typedef std::vector<Particle*> particleVec;
 

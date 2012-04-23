@@ -26,6 +26,11 @@ ParticleEmitter::ParticleEmitter(MObject3d * parentObject)
 , m_Texture(0)
 , m_PointSprite(false)
 , m_EmmitSize(50.0f)
+, m_Influence(0.0f)
+, m_Mass(0.0f)
+, m_PhysDisableTime(0)
+, m_PointEmitter(true)
+, m_EmitterSize(1.0f, 1.0f, 1.0f)
 {
 	Init();
 }
@@ -39,8 +44,8 @@ ParticleEmitter::ParticleEmitter(ParticleEmitter & behavior, MObject3d * parentO
 , m_PrevEmitTime(0)
 , m_Age(0)
 , m_PrevTickTime(0)
-, m_MinLife(0)
-, m_MaxLife(100)
+, m_MinLife(1000)
+, m_MaxLife(5000)
 , m_EmitDir(0.0f, 0.0f, 1.0f)
 , m_Acceleration(0.0f, 0.0f, 0.0f)
 , m_HasGravity(false)
@@ -49,6 +54,11 @@ ParticleEmitter::ParticleEmitter(ParticleEmitter & behavior, MObject3d * parentO
 , m_Texture(0)
 , m_PointSprite(false)
 , m_EmmitSize(50.0f)
+, m_Influence(0.0f)
+, m_Mass(0.0f)
+, m_PhysDisableTime(behavior.m_PhysDisableTime)
+, m_PointEmitter(behavior.m_PointEmitter)
+, m_EmitterSize(behavior.m_EmitterSize)
 {
 	Init();
 }
@@ -71,7 +81,7 @@ MBehavior * ParticleEmitter::getCopy(MObject3d * parentObject)
 }
 
 unsigned int ParticleEmitter::getVariablesNumber(void){
-	return 12;
+	return m_PointEmitter ? 16 : 17;
 }
 
 MVariable ParticleEmitter::getVariable(unsigned int id)
@@ -114,6 +124,21 @@ MVariable ParticleEmitter::getVariable(unsigned int id)
 	case 11:
 	    return MVariable("EmitSize", &m_EmmitSize, M_VARIABLE_FLOAT);
 	    break;
+	case 12:
+	    return MVariable("Influence", &m_Influence, M_VARIABLE_FLOAT);
+	    break;
+	case 13:
+	    return MVariable("Mass", &m_Mass, M_VARIABLE_FLOAT);
+	    break;
+	case 14:
+	    return MVariable("PhysDisableTime", &m_PhysDisableTime, M_VARIABLE_INT);
+	    break;
+	case 15:
+	    return MVariable("PointEmitter", &m_PointEmitter, M_VARIABLE_BOOL);
+	    break;
+	case 16:
+		return MVariable("EmitterSize", &m_EmitterSize, M_VARIABLE_VEC3);
+		break;
 	default:
 		return MVariable("NULL", NULL, M_VARIABLE_NULL);
 		break;
@@ -126,10 +151,10 @@ void ParticleEmitter::update(void)
 
 	MGame* game = engine->getGame();
 
-	GetParticleSystem()->Update();
 
 	if(game->isRunning())
 	{
+		GetParticleSystem()->Update();
 		CheckToSpawnParticles();
 	}
 }
@@ -143,7 +168,8 @@ void ParticleEmitter::draw()
 	if(m_Texture && m_Texture->getTextureId() > 0)
 	{
 	    render->enableTexture();
-		render->setBlendingMode(M_BLENDING_ADD);
+		//render->setBlendingMode(M_BLENDING_ADD);
+		render->setBlendingMode(M_BLENDING_ALPHA);
 		render->enableBlending();
 
 	    m_Texture->update();
@@ -257,6 +283,14 @@ void ParticleEmitter::EmitParticle()
 		newParticle->SetID(ID);
 		if(MObject3d* obj = getParentObject())
 		    m_Positions[ID] = obj->getPosition();
+
+		if(!m_PointEmitter)
+		{
+			m_Positions[ID] += MVector3( (m_EmitterSize.x * (float)rand() / (float)RAND_MAX) - (m_EmitterSize.x / 2.0f),
+										 (m_EmitterSize.y * (float)rand() / (float)RAND_MAX) - (m_EmitterSize.y / 2.0f),
+										 (m_EmitterSize.z * (float)rand() / (float)RAND_MAX) - (m_EmitterSize.z / 2.0f) );
+		}
+
 		newParticle->SetPosition(&m_Positions[ID]);
 		newParticle->SetEmitter(this);
 		newParticle->SetLife(m_MinLife + (rand() % (m_MaxLife - m_MinLife)));
@@ -278,6 +312,10 @@ void ParticleEmitter::EmitParticle()
 		newParticle->SetVelocity(dir * m_Force);
 		newParticle->SetAcceleration(m_Acceleration);
 		newParticle->SetHasGravity(m_HasGravity);
+		newParticle->SetInfluence(m_Influence);
+		newParticle->SetSize(m_EmmitSize);
+		newParticle->SetMass(m_Mass);
+		newParticle->SetPhysDisableTime(m_PhysDisableTime);
 		m_FreeParticles.pop_back();
 	}
 }
