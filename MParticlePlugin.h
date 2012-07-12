@@ -2,22 +2,14 @@
 #ifndef __PARTICLE_PLUGIN_H__
 #define __PARTICLE_PLUGIN_H__
 
-#ifdef WIN32
-	#include <windows.h>
-	#define DLLEXPORT __declspec(dllexport)
+#include <MEngine.h>
+
+#ifdef MPLUGIN_AVAILABLE
+#    include <MPlugin.h>
 #else
-	#define DLLEXPORT
-#endif
+#    include "PluginCompatibility.h"
+#endif/*MPLUGIN_AVAILABLE*/
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-	DLLEXPORT void StartPlugin();
-	DLLEXPORT void EndPlugin();
-	
-#ifdef __cplusplus
-}
-#endif
+MPLUGIN_DECLARE(MParticle);
 
 #endif /*__PARTICLE_PLUGIN_H__*/

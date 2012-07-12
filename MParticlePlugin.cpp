@@ -6,7 +6,7 @@
 #include <MEngine.h>
 #include <MBehaviorManager.h>
 
-void StartPlugin()
+MPLUGIN_START_IMPLEMENT(MParticle)
 {
 	// get engine
 	MEngine * engine = MEngine::getInstance();
@@ -18,6 +18,6 @@ void StartPlugin()
 	GetParticleSystem()->Init();
 }
 
-void EndPlugin()
+MPLUGIN_END_IMPLEMENT(MParticle)
 {
 }

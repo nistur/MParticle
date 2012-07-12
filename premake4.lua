@@ -13,6 +13,8 @@ solution "MParticle"
 				os.getenv("MSDKDIR") .. "SDK/MEngine/Includes",
 				"."}
 
+	defines { "MPLUGIN_DYNAMIC" }
+	
 	-- OS defines
 	if os.is("windows") then
 		defines { "WIN32" }
@@ -38,6 +40,8 @@ solution "MParticle"
 			["Game/*"] = { "**.h", "**.cpp" },
 			["Doc/*"] = { "**.md" }
 		}
+
+		targetprefix ""
 
 		-- link to Maratis
 		links { "MCore", "MGui", "MEngine" }
