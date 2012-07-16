@@ -2,15 +2,14 @@
 solution "MParticle"
 	configurations { "Debug", "Release" }
 	language "C++"
-
-	print(os.getenv("MSDKDIR"))		
+	
 	-- make sure we can search and link properly
-	libdirs { os.getenv("MSDKDIR") .. "SDK/MCore/Libs",
-				os.getenv("MSDKDIR") .. "SDK/MGui/Libs",
-				os.getenv("MSDKDIR") .. "SDK/MEngine/Libs"}
-	includedirs { os.getenv("MSDKDIR") .. "SDK/MCore/Includes",
-				os.getenv("MSDKDIR") .. "SDK/MGui/Includes",
-				os.getenv("MSDKDIR") .. "SDK/MEngine/Includes",
+	libdirs { os.getenv("MSDKDIR") .. "/SDK/MCore/Libs",
+				os.getenv("MSDKDIR") .. "/SDK/MGui/Libs",
+				os.getenv("MSDKDIR") .. "/SDK/MEngine/Libs"}
+	includedirs { os.getenv("MSDKDIR") .. "/SDK/MCore/Includes",
+				os.getenv("MSDKDIR") .. "/SDK/MGui/Includes",
+				os.getenv("MSDKDIR") .. "/SDK/MEngine/Includes",
 				"."}
 
 	defines { "MPLUGIN_DYNAMIC" }
@@ -34,10 +33,10 @@ solution "MParticle"
 
 		-- split the files up a bit nicer inside Visual Studio
 		vpaths { 
-			["MCore/*"] = os.getenv("MSDKDIR") .. "SDK/MCore/Includes/**.h",
-			["MEngine/*"] = os.getenv("MSDKDIR") .. "SDK/MEngine/Includes/**.h",
-			["MGui/*"] = os.getenv("MSDKDIR") .. "SDK/MGui/Includes/**.h",
-			["Game/*"] = { "**.h", "**.cpp" },
+			["MCore/*"] = os.getenv("MSDKDIR") .. "/SDK/MCore/Includes/**.h",
+			["MEngine/*"] = os.getenv("MSDKDIR") .. "/SDK/MEngine/Includes/**.h",
+			["MGui/*"] = os.getenv("MSDKDIR") .. "/SDK/MGui/Includes/**.h",
+			["MParticle/*"] = { "**.h", "**.cpp" },
 			["Doc/*"] = { "**.md" }
 		}
 
