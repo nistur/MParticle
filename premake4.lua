@@ -2,16 +2,15 @@
 solution "MParticle"
 	configurations { "Debug", "Release" }
 	language "C++"
-
-	print(os.getenv("MSDKDIR"))		
+	
 	-- make sure we can search and link properly
-	libdirs { os.getenv("MSDKDIR") .. "SDK/MCore/Libs",
-		  os.getenv("MSDKDIR") .. "SDK/MGui/Libs",
-		  os.getenv("MSDKDIR") .. "SDK/MEngine/Libs"}
-	includedirs { os.getenv("MSDKDIR") .. "SDK/MCore/Includes",
-		      os.getenv("MSDKDIR") .. "SDK/MGui/Includes",
-		      os.getenv("MSDKDIR") .. "SDK/MEngine/Includes",
-		      os.getenv("MSDKDIR") .. "SDK/MIngEd/Includes",
+	libdirs { os.getenv("MSDKDIR") .. "/SDK/MCore/Libs",
+				os.getenv("MSDKDIR") .. "/SDK/MGui/Libs",
+				os.getenv("MSDKDIR") .. "/SDK/MEngine/Libs"}
+	includedirs { os.getenv("MSDKDIR") .. "/SDK/MCore/Includes",
+		      os.getenv("MSDKDIR") .. "/SDK/MGui/Includes",
+		      os.getenv("MSDKDIR") .. "/SDK/MEngine/Includes",
+		      os.getenv("MSDKDIR") .. "/SDK/MIngEd/Includes",
 		      "src/common/" }
 
 	defines { "MPLUGIN_DYNAMIC" }
@@ -36,10 +35,10 @@ solution "MParticle"
 
 		-- split the files up a bit nicer inside Visual Studio
 		vpaths { 
-			["MCore/*"] = os.getenv("MSDKDIR") .. "SDK/MCore/Includes/**.h",
-			["MEngine/*"] = os.getenv("MSDKDIR") .. "SDK/MEngine/Includes/**.h",
-			["MGui/*"] = os.getenv("MSDKDIR") .. "SDK/MGui/Includes/**.h",
-			["MIngEd/*"] = os.getenv("MSDKDIR") .. "SDK/MIngEd/Includes/**.h",
+			["MCore/*"] = os.getenv("MSDKDIR") .. "/SDK/MCore/Includes/**.h",
+			["MEngine/*"] = os.getenv("MSDKDIR") .. "/SDK/MEngine/Includes/**.h",
+			["MGui/*"] = os.getenv("MSDKDIR") .. "/SDK/MGui/Includes/**.h",
+			["MIngEd/*"] = os.getenv("MSDKDIR") .. "/SDK/MIngEd/Includes/**.h",
 			["Plugin/*"] = { "**.h", "**.cpp" },
 			["Doc/*"] = { "**.md" }
 		}
@@ -73,10 +72,10 @@ solution "MParticle"
 
 		-- split the files up a bit nicer inside Visual Studio
 		vpaths { 
-			["MCore/*"] = os.getenv("MSDKDIR") .. "SDK/MCore/Includes/**.h",
-			["MEngine/*"] = os.getenv("MSDKDIR") .. "SDK/MEngine/Includes/**.h",
-			["MGui/*"] = os.getenv("MSDKDIR") .. "SDK/MGui/Includes/**.h",
-			["MIngEd/*"] = os.getenv("MSDKDIR") .. "SDK/MIngEd/Includes/**.h",
+			["MCore/*"] = os.getenv("MSDKDIR") .. "/SDK/MCore/Includes/**.h",
+			["MEngine/*"] = os.getenv("MSDKDIR") .. "/SDK/MEngine/Includes/**.h",
+			["MGui/*"] = os.getenv("MSDKDIR") .. "/SDK/MGui/Includes/**.h",
+			["MIngEd/*"] = os.getenv("MSDKDIR") .. "/SDK/MIngEd/Includes/**.h",
 			["Editor/*"] = { "src/editor/**.h", "src/editor/**.h" },
 			["Data/*"] = { "src/editor/data/**.lua" },
 			["Doc/*"] = { "**.md" }
