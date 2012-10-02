@@ -19,6 +19,10 @@ OS X:
 Updates
 -------
 
+Update 02.10.2012 - 
+* Updated MIngEd support
+* Split into editor plugin and runtime plugin
+
 Update 14.07.2012 - Added support for MIngEd system
 
 Update 05.04.2012 - 
