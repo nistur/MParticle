@@ -12,6 +12,7 @@
 #endif/*MEMBED_AVAILABLE*/
 
 
+MPackage s_Data = 0;
 MPLUGIN_START_IMPLEMENT(MParticle)
 {
     // get engine
@@ -33,9 +34,13 @@ MPLUGIN_START_IMPLEMENT(MParticle)
     // try to load the package anyway,
     // who knows, we might find it
     if(engine->getPackageManager())
-	engine->getPackageManager()->loadPackage("MParticle.npk");
+	s_Data = engine->getPackageManager()->loadPackage("MParticle.npk");
 }
 
 MPLUGIN_END_IMPLEMENT(MParticle)
 {
+    MEngine* engine = MEngine::getInstance();
+    if(s_Data && engine && engine->getPackageManager())
+	engine->getPackageManager()->unloadPackage(s_Data);
+    s_Data = 0;
 }

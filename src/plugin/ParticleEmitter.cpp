@@ -86,63 +86,63 @@ unsigned int ParticleEmitter::getVariablesNumber(void){
 
 MVariable ParticleEmitter::getVariable(unsigned int id)
 {
-	switch(id)
-	{
-	case 0:
-		return MVariable("MaxCount", &m_Count, M_VARIABLE_INT);
-		break;
-	case 1:
-		return MVariable("EmitPeriod", &m_EmitPeriod, M_VARIABLE_INT);
-		break;
-	case 2:
-		return MVariable("MinLife", &m_MinLife, M_VARIABLE_INT);
-		break;
-	case 3:
-		return MVariable("MaxLife", &m_MaxLife, M_VARIABLE_INT);
-		break;
-	case 4:
-		return MVariable("Direction", &m_EmitDir, M_VARIABLE_VEC3);
-		break;
-	case 5:
-		return MVariable("Gravity", &m_HasGravity, M_VARIABLE_BOOL);
-		break;
-	case 6:
-		return MVariable("Acceleration", &m_Acceleration, M_VARIABLE_VEC3);
-		break;
-	case 7:
-		return MVariable("Spread", &m_Angle, M_VARIABLE_FLOAT);
-		break;
-	case 8:
-		return MVariable("Force", &m_Force, M_VARIABLE_FLOAT);
-		break;
-	case 9:
-	    return MVariable("Texture", &m_Texture, M_VARIABLE_TEXTURE_REF);
-	    break;
-	case 10:
-	    return MVariable("PointSprite", &m_PointSprite, M_VARIABLE_BOOL);
-	    break;
-	case 11:
-	    return MVariable("EmitSize", &m_EmmitSize, M_VARIABLE_FLOAT);
-	    break;
-	case 12:
-	    return MVariable("Influence", &m_Influence, M_VARIABLE_FLOAT);
-	    break;
-	case 13:
-	    return MVariable("Mass", &m_Mass, M_VARIABLE_FLOAT);
-	    break;
-	case 14:
-	    return MVariable("PhysDisableTime", &m_PhysDisableTime, M_VARIABLE_INT);
-	    break;
-	case 15:
-	    return MVariable("PointEmitter", &m_PointEmitter, M_VARIABLE_BOOL);
-	    break;
-	case 16:
-		return MVariable("EmitterSize", &m_EmitterSize, M_VARIABLE_VEC3);
-		break;
-	default:
-		return MVariable("NULL", NULL, M_VARIABLE_NULL);
-		break;
-	}
+    switch(id)
+    {
+    case 0:
+	return MVariable("MaxCount", &m_Count, M_VARIABLE_INT);
+	break;
+    case 1:
+	return MVariable("EmitPeriod", &m_EmitPeriod, M_VARIABLE_INT);
+	break;
+    case 2:
+	return MVariable("MinLife", &m_MinLife, M_VARIABLE_INT);
+	break;
+    case 3:
+	return MVariable("MaxLife", &m_MaxLife, M_VARIABLE_INT);
+	break;
+    case 4:
+	return MVariable("Direction", &m_EmitDir, M_VARIABLE_VEC3);
+	break;
+    case 5:
+	return MVariable("Gravity", &m_HasGravity, M_VARIABLE_BOOL);
+	break;
+    case 6:
+	return MVariable("Acceleration", &m_Acceleration, M_VARIABLE_VEC3);
+	break;
+    case 7:
+	return MVariable("Spread", &m_Angle, M_VARIABLE_FLOAT);
+	break;
+    case 8:
+	return MVariable("Force", &m_Force, M_VARIABLE_FLOAT);
+	break;
+    case 9:
+	return MVariable("Texture", &m_Texture, M_VARIABLE_TEXTURE_REF);
+	break;
+    case 10:
+	return MVariable("PointSprite", &m_PointSprite, M_VARIABLE_BOOL);
+	break;
+    case 11:
+	return MVariable("EmitSize", &m_EmmitSize, M_VARIABLE_FLOAT);
+	break;
+    case 12:
+	return MVariable("Influence", &m_Influence, M_VARIABLE_FLOAT);
+	break;
+    case 13:
+	return MVariable("Mass", &m_Mass, M_VARIABLE_FLOAT);
+	break;
+    case 14:
+	return MVariable("PhysDisableTime", &m_PhysDisableTime, M_VARIABLE_INT);
+	break;
+    case 15:
+	return MVariable("PointEmitter", &m_PointEmitter, M_VARIABLE_BOOL);
+	break;
+    case 16:
+	return MVariable("EmitterSize", &m_EmitterSize, M_VARIABLE_VEC3);
+	break;
+    default:
+	return MVariable("NULL", NULL, M_VARIABLE_NULL);
+	break;
+    }
 }
 
 void ParticleEmitter::update(void)
